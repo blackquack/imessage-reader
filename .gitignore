@@ -1,0 +1,15 @@
+# macOS and Python artifacts
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Local runtime data and credentials
+.env
+.env.*
+*.db
+*.sqlite
+*.sqlite3
+*.log
+*.session
