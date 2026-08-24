@@ -1,0 +1,25 @@
+{
+  "name": "imessage-reader",
+  "version": "0.1.0+codex.20260823210903",
+  "description": "Read locally synced macOS Messages history in read-only mode.",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "iMessage Reader",
+    "shortDescription": "Read local Messages history safely.",
+    "longDescription": "Read and search locally synced macOS Messages history through narrow, read-only MCP tools. This plugin never sends, edits, deletes, or bulk-exports messages.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "defaultPrompt": [
+      "Read my latest single message.",
+      "Search my recent Messages history.",
+      "Show my conversation with a contact."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}
