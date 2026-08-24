@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "imessage": {
+      "command": "./skills/imessage-reader/scripts/imessage_mcp.py",
+      "cwd": ".",
+      "startup_timeout_sec": 20,
+      "tool_timeout_sec": 60
+    }
+  }
+}
