@@ -1,0 +1,4 @@
+interface:
+  display_name: "Read iMessages"
+  short_description: "Read local Messages history safely"
+  default_prompt: "Use $imessage-reader to find the relevant messages and summarize them read-only."
