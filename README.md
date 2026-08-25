@@ -35,3 +35,7 @@ From the repository root:
 ```bash
 python3 -m py_compile skills/imessage-reader/scripts/imessage_query.py skills/imessage-reader/scripts/imessage_mcp.py
 ```
+
+## License
+
+MIT. See [LICENSE](LICENSE).
