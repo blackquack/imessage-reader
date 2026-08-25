@@ -1,6 +1,6 @@
 {
   "name": "imessage-reader",
-  "version": "0.1.0+codex.20260825021458",
+  "version": "0.1.0+codex.20260825024519",
   "description": "Read locally synced macOS Messages history in read-only mode.",
   "author": {
     "name": "Local developer"
@@ -15,6 +15,9 @@
     "capabilities": [
       "Read"
     ],
+    "brandColor": "#34C759",
+    "composerIcon": "./assets/imessage-icon.png",
+    "logo": "./assets/imessage-icon.png",
     "defaultPrompt": [
       "Read my latest single message.",
       "Search my recent Messages history.",
