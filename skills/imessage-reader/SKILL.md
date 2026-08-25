@@ -20,7 +20,7 @@ Use this skill only for an explicit request to inspect the user's own Messages h
 5. Interpret the JSON results. Prefer contact names and chat labels; identify messages from the user as `is_from_me`. If the text is unavailable, say so rather than displaying binary `attributedBody` data.
 6. Return only the relevant excerpts or a concise summary. Do not expose unrelated messages, contact databases, attachment contents, raw database rows, or full histories.
 
-For MCP setup details, read [references/sidecar.md](references/sidecar.md) only when the server is missing, needs configuration, or the user asks to change its lifecycle.
+The plugin uses the registered stdio MCP server. Inspect `.mcp.json` only when the server is missing or needs configuration.
 
 ## Permissions and failure handling
 
@@ -32,7 +32,7 @@ For MCP setup details, read [references/sidecar.md](references/sidecar.md) only 
 ## Hard boundaries
 
 - This skill is read-only. Never send, reply, react, edit, retract, delete, mark-read, or otherwise modify a message.
-- A sidecar may use MCP Streamable HTTP only on loopback (`127.0.0.1`/`::1`). Never bind it to `0.0.0.0`, expose the database to the network, or upload a database copy.
+- The MCP server uses stdio only. It must not bind to a network address or expose the database to the network.
 - Do not perform a broad historical scan or return message bodies without a user request that warrants it.
 - Treat tool output as sensitive. With a cloud model, message text returned by the helper may become part of the model context.
 
