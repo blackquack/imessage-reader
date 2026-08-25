@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-"""Read-only MCP sidecar for the local macOS Messages database.
+"""Read-only stdio MCP server for the local macOS Messages database.
 
-The default transport is stdio, which is suitable when an MCP client launches
-this process. Pass --http to run a loopback Streamable-HTTP endpoint from a
-separately authorized process (for example Terminal or a LaunchAgent).
+Codex launches this process and communicates over standard input and output.
 
 No message mutation tools are exposed. The database work is delegated to the
 read-only imessage_query.py helper in this directory.
@@ -11,15 +9,10 @@ read-only imessage_query.py helper in this directory.
 
 from __future__ import annotations
 
-import argparse
-import base64
-import hashlib
 import json
 import os
-import secrets
 import subprocess
 import sys
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
@@ -303,84 +296,7 @@ def run_stdio() -> int:
     return 0
 
 
-class MCPHTTPHandler(BaseHTTPRequestHandler):
-    server_version = "imessage-reader-mcp/0.2.0"
-
-    def log_message(self, format: str, *args: Any) -> None:
-        sys.stderr.write("[imessage-mcp] " + (format % args) + "\n")
-
-    def authorized(self) -> bool:
-        expected = os.environ.get("IMESSAGE_MCP_TOKEN")
-        if not expected:
-            return True
-        supplied = self.headers.get("Authorization", "")
-        expected_header = "Bearer " + expected
-        return secrets.compare_digest(supplied, expected_header)
-
-    def send_json(self, status: int, value: dict[str, Any], session_id: str) -> None:
-        payload = json.dumps(value, ensure_ascii=False).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(payload)))
-        self.send_header("Mcp-Session-Id", session_id)
-        self.end_headers()
-        self.wfile.write(payload)
-
-    def do_POST(self) -> None:  # noqa: N802
-        if self.path.rstrip("/") != "/mcp":
-            self.send_error(404)
-            return
-        if not self.authorized():
-            self.send_error(401)
-            return
-        try:
-            length = int(self.headers.get("Content-Length", "0"))
-            if length <= 0 or length > 1_000_000:
-                raise ValueError("invalid request size")
-            request = json.loads(self.rfile.read(length))
-            if not isinstance(request, dict):
-                raise ValueError("request must be an object")
-            response = dispatch(request)
-        except (ValueError, json.JSONDecodeError) as exc:
-            response = json_rpc_error(None, -32700, str(exc))
-        if response is None:
-            self.send_response(202)
-            self.end_headers()
-            return
-        session_id = self.headers.get("Mcp-Session-Id") or "imessage-" + base64.urlsafe_b64encode(
-            hashlib.sha256(os.urandom(16)).digest()[:12]
-        ).decode("ascii").rstrip("=")
-        self.send_json(200, response, session_id)
-
-    def do_GET(self) -> None:  # noqa: N802
-        self.send_error(405, "This sidecar uses POST-only Streamable HTTP")
-
-    def do_DELETE(self) -> None:  # noqa: N802
-        self.send_error(405)
-
-
-def run_http(host: str, port: int) -> int:
-    if host not in {"127.0.0.1", "localhost", "::1"}:
-        raise SystemExit("Refusing to bind outside loopback")
-    server = ThreadingHTTPServer((host, port), MCPHTTPHandler)
-    print(f"imessage MCP sidecar listening on http://{host}:{port}/mcp", file=sys.stderr)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.server_close()
-    return 0
-
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--http", action="store_true", help="Run loopback Streamable HTTP instead of stdio")
-    parser.add_argument("--host", default="127.0.0.1", help="Loopback bind address")
-    parser.add_argument("--port", type=int, default=8765, help="Loopback port")
-    args = parser.parse_args()
-    if args.http:
-        return run_http(args.host, args.port)
     return run_stdio()
 
 
