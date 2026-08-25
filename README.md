@@ -14,6 +14,8 @@ Read locally synced macOS Messages history in read-only mode through a Codex plu
 
 This repository contains source code and plugin metadata only. It does not contain a Messages database, message text, attachments, credentials, or access tokens.
 
+On your MacBook, grant the ChatGPT desktop app Full Disk Access in System Settings > Privacy & Security > Full Disk Access. If the app is listed as Codex, enable that app instead. The app that actually launches the MCP process must have this permission.
+
 At runtime, the helper reads the Mac-local `~/Library/Messages/chat.db`. Message text returned by an explicit query is sensitive and may become part of the Codex conversation context. Use the smallest query and result limit that answers the request.
 
 The process that opens the database must have macOS Full Disk Access. The optional HTTP sidecar must remain on `127.0.0.1` or `::1`; do not expose it to a LAN, port forwarding, or `0.0.0.0`. `IMESSAGE_MCP_TOKEN` can add bearer-token protection when using HTTP.
